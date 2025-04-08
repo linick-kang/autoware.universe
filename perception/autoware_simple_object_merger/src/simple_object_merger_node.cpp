@@ -184,9 +184,14 @@ void SimpleObjectMergerNode::onTimer()
         output_objects.objects.end(), std::begin(transformed_objects->objects),
         std::end(transformed_objects->objects));
     } else {
-      RCLCPP_INFO(
-        rclcpp::get_logger("simple_object_merger"), "Topic of %s is timeout by %f sec",
-        node_param_.topic_names.at(i).c_str(), time_diff);
+      static std::vector<rclcpp::Time> last_log_times(input_topic_size, this->now());
+      rclcpp::Time now = this->now();
+      if ((now - last_log_times[i]) > rclcpp::Duration::from_seconds(3.0)) {
+        RCLCPP_INFO(
+          rclcpp::get_logger("simple_object_merger"), "Topic of %s is timeout by %f sec",
+          node_param_.topic_names.at(i).c_str(), time_diff);
+        last_log_times[i] = now;
+      }
     }
   }
 
