@@ -140,13 +140,8 @@ void ObjectLaneletFilterNode::objectCallback(
   autoware_perception_msgs::msg::DetectedObjects output_object_msg;
   output_object_msg.header = input_msg->header;
 
-  static rclcpp::Time last_log_time = this->now();
-  const rclcpp::Time now = this->now();
   if (!lanelet_map_ptr_) {
-    if ((now - last_log_time) > rclcpp::Duration::from_seconds(3.0)) {
-      RCLCPP_WARN(get_logger(), "No vector map received.");
-      last_log_time = now;
-    }
+    RCLCPP_ERROR_THROTTLE(get_logger(), *get_clock(), 3000, "No vector map received.");
     return;
   }
   autoware_perception_msgs::msg::DetectedObjects transformed_objects;
